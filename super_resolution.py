@@ -6,12 +6,12 @@ import numpy as np
 hq_image_creator = ISR(tile=128)
 
 
-def get_high_resolution(img_path):
-    image = cv2.imread(img_path)
-    image = np.array(image)
+def get_high_resolution(img):
+    # image = cv2.imread(img_path)
+    image = np.array(img)
 
     prediction= hq_image_creator.get_super_resolution(image,upscale_factor=4)
-    utils.show_image(prediction)
+    # utils.show_image(prediction)
     return prediction
 
 
