@@ -8,6 +8,7 @@ from schemas.user import serializeDict, serializeList
 from super_resolution import get_high_resolution
 import utils
 import numpy as np
+from PIL import Image as im
 
 user = APIRouter()
 
@@ -28,8 +29,10 @@ async def upload(files: List[UploadFile] = File(...)):
     for file in files:
         
         contents = await file.read()
-        print(contents)
-
+        # print(contents)
+        filename=file.filename
+        file_content_type = file.content_type
+        print(filename)
         try:
             img = np.array(Image.open(BytesIO(contents)))
         except:
@@ -43,13 +46,11 @@ async def upload(files: List[UploadFile] = File(...)):
         else :
             image_prediction = img
 
+        # get s3 link from here
+        uploaded_image_url = utils.upload_file(image_prediction)
 
 
-        # get s3 link from here and save it in the database. Then return 200
-
-        # image_prediction = cv2.cvtColor(image_prediction,cv2.COLOR_RGB2BGR)
-        # utils.show_image(image_prediction)
-        # return get_high_resolution(img)
+        print(uploaded_image_url)
 
     return {"Uploaded Filenames": [file.filename for file in files]}
     
