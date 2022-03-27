@@ -77,7 +77,7 @@ def upload_file_to_s3(file, bucket_name=S3_BUCKET, acl="public-read"):
 def upload_file(imageFile):
     file_path = create_temp(imageFile)
     print(file_path)
-    file = cv2.imread(file_path)
+    # img = cv2.imread('g4g.png')
     # file = file_path
     
     """
@@ -89,7 +89,13 @@ def upload_file(imageFile):
         file.mimetype
 
     """
-
+    bucket = S3_BUCKET
+    file_name = file_path
+    key_name = secure_filename(file_name)
+    s3.upload_file(file_name, bucket, key_name)
+    s3_path= "https://" + S3_BUCKET + ".s3." + S3_REGION + ".amazonaws.com/" + key_name
+    print(s3_path)
+    return s3_path
     # if no file name then select a file
     if file.filename == "":
         return "Please select a file"
