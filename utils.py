@@ -47,41 +47,25 @@ def create_temp(img):
     save_path = "./temp/" + res + ".png"
     cv2.imwrite(save_path,img)
     return save_path
+    
 
-def upload_file_to_s3(file,bucket_name=S3_BUCKET, acl="public-read"):
+def upload_file_to_s3(file, bucket_name=S3_BUCKET, acl="public-read"):
 
     """
     Docs: http://boto3.readthedocs.io/en/latest/guide/s3.html
     """
-    # my_array = numpy.random.randn(10)
 
-    # upload without using disk
-    # my_array_data = io.BytesIO()
-    
-    # pickle.dump(file, my_array_data)
-    
-    # my_array_data.seek(0)
-    print(type(file))
-    # print(file)
     try:
 
-        # s3.upload_fileobj(file, bucket_name, filename, ExtraArgs={'ACL': acl, 'ContentType': file_content_type})
-        s3.put_object(
-            ACL= acl,
-            ContentType=file.content_type,
-            Body=file,
-            Bucket=bucket_name,
-            Key=file.filename,
+        s3.upload_fileobj(
+            file,
+            bucket_name,
+            file.filename,
+            ExtraArgs={
+                "ACL": acl,
+                "ContentType": file.content_type
+            }
         )
-        # s3.upload_fileobj(
-        #     file,
-        #     bucket_name,
-        #     filename,
-        #     ExtraArgs={
-        #         "ACL": acl,
-        #         "ContentType": file_content_type
-        #     }
-        # )
 
     except Exception as e:
         print("Something Happened: ", e)
@@ -92,11 +76,14 @@ def upload_file_to_s3(file,bucket_name=S3_BUCKET, acl="public-read"):
 # only for uploading image function to S3. Nothing to do with preprocessing
 def upload_file(imageFile):
     file_path = create_temp(imageFile)
-    file = file_path
+    print(file_path)
+    file = cv2.imread(file_path)
+    # file = file_path
+    
     """
         These attributes are also available
 
-        filename               # The actual name of the file
+        file.filename               # The actual name of the file
         file.content_type
         file.content_length
         file.mimetype
@@ -104,13 +91,13 @@ def upload_file(imageFile):
     """
 
     # if no file name then select a file
-    # if filename == "":
-    #     return "Please select a file"
+    if file.filename == "":
+        return "Please select a file"
 
     # D.
-    
-    filename = secure_filename(file)
-    output = upload_file_to_s3(filename)
-    print(output)
-    return "https://" + S3_BUCKET + ".s3." + S3_REGION + ".amazonaws.com/" + output
-    
+    if file:
+        file.filename = secure_filename(file.filename)
+        output = upload_file_to_s3(file)
+        return "https://" + S3_BUCKET + ".s3." + S3_REGION + ".amazonaws.com/" + output
+    else:
+        return null
